@@ -1,0 +1,123 @@
+variables:
+  REAL_REGISTRY: registry.<YOUR_GITLAB_DOMAIN>
+  CONTAINER_IMAGE: ${REAL_REGISTRY}/${CI_PROJECT_PATH}:${CI_COMMIT_REF_NAME}_${CI_COMMIT_SHA}
+  CONTAINER_IMAGE_LATEST: ${REAL_REGISTRY}/${CI_PROJECT_PATH}:latest
+  DOCKER_HOST: tcp://localhost:2375
+  DOCKER_DRIVER: overlay
+
+
+  KUBECONFIG_PATH: /root/.kube/
+  KUBECONFIG_FILE: /root/.kube/config
+  DEV_NAMESPACE: demo-dev
+  DEV_RELEASE_NAME: demo-proj
+  STAGING_NAMESPACE: demo-staging
+  STAGING_RELEASE_NAME: demo-proj
+  PRODUCTION_RELEASE_NAME: demo-proj
+  PRODUCTION_NAMESPACE: demo-prod
+  DISABLE_POSTGRES: "yes"
+  HELM_ORG: "demoproj"
+  HELM_PATH: "demoproj/demo-proj"
+  HELM_URL: "https://<YOUR_HELM_REPO_BUCKET_SLUG>.oss-ap-southeast-1.aliyuncs.com/helm-repo"
+
+
+services:
+  - docker:dind
+cache:
+  untracked: true
+  key: "$CI_BUILD_REF_NAME"
+
+stages:
+  - test
+  - build
+  - release
+  - deploy
+
+build_kaniko:
+  stage: build
+  image: "tiancaicommunity/gitlab-kaniko:v1.0.0"
+  script:
+    - mkdir -p /root/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CONTAINER_IMAGE
+  only:
+  - devlive
+  - staging
+  - production
+
+
+
+deploy_prod:
+  stage: deploy
+  image: tiancaicommunity/helm-kubectl:2.8.2
+  before_script:
+    - export CURRENT_NS=${PRODUCTION_NAMESPACE}
+    - mkdir -p ${KUBECONFIG_PATH}
+    - echo ${kube_config_prod} | base64 -d > ${KUBECONFIG_FILE}
+    - export kube_config_prod=old
+    - export KUBECONFIG=${KUBECONFIG_FILE}
+    - kubectl config use-context gitlab-system
+    - helm init --client-only --service-account tiller --tiller-namespace ${CURRENT_NS}
+    - helm repo add $HELM_ORG $HELM_URL
+  script:
+    - export CURRENT_NS=${PRODUCTION_NAMESPACE}
+    - export CURRENT_RELEASE=${PRODUCTION_RELEASE_NAME}
+    - export kube_config_prod=old
+    - export DEPLOYS=$(helm ls --tiller-namespace $CURRENT_NS | grep $CURRENT_RELEASE | wc -l)
+    - if [ ${DEPLOYS} -eq 0 ]; then helm install --name=${CURRENT_RELEASE} ${HELM_PATH} --set digitMs.image=${CONTAINER_IMAGE} --namespace=${CURRENT_NS} --tiller-namespace=${CURRENT_NS}; else helm upgrade ${CURRENT_RELEASE} ${HELM_PATH} --namespace=${CURRENT_NS} --tiller-namespace=${CURRENT_NS} --set digitMs.image=${CONTAINER_IMAGE} --reuse-values; fi
+  environment:
+    name: prod
+    url: https://prod.id0.dws.im
+  only:
+  - production
+
+
+
+deploy_dev:
+  stage: deploy
+  image: tiancaicommunity/helm-kubectl:2.8.2
+  before_script:
+    - export CURRENT_NS=${DEV_NAMESPACE}
+    - mkdir -p ${KUBECONFIG_PATH}
+    - echo ${kube_config_dev} | base64 -d > ${KUBECONFIG_FILE}
+    - export kube_config_dev=old
+    - export KUBECONFIG=${KUBECONFIG_FILE}
+    - kubectl config use-context gitlab-system
+    - helm init --client-only --service-account tiller --tiller-namespace ${CURRENT_NS}
+    - helm repo add $HELM_ORG $HELM_URL
+  script:
+    - export CURRENT_NS=${DEV_NAMESPACE}
+    - export CURRENT_RELEASE=${DEV_RELEASE_NAME}
+    - export kube_config_dev=old
+    - export DEPLOYS=$(helm ls --tiller-namespace $CURRENT_NS | grep $CURRENT_RELEASE | wc -l)
+    - if [ ${DEPLOYS} -eq 0 ]; then helm install --name=${CURRENT_RELEASE} ${HELM_PATH} --set digitMs.image=${CONTAINER_IMAGE} --namespace=${CURRENT_NS} --tiller-namespace=${CURRENT_NS}; else helm upgrade ${CURRENT_RELEASE} ${HELM_PATH} --namespace=${CURRENT_NS} --tiller-namespace=${CURRENT_NS} --set digitMs.image=${CONTAINER_IMAGE} --reuse-values; fi
+  environment:
+    name: dev
+    url: https://dev.id0.dws.im
+  only:
+  - devlive
+
+deploy_staging:
+  stage: deploy
+  image: tiancaicommunity/helm-kubectl:2.8.2
+  before_script:
+    - export CURRENT_NS=${STAGING_NAMESPACE}
+    - mkdir -p ${KUBECONFIG_PATH}
+    - echo ${kube_config_staging} | base64 -d > ${KUBECONFIG_FILE}
+    - export kube_config_staging=old
+    - export KUBECONFIG=${KUBECONFIG_FILE}
+    - kubectl config use-context gitlab-system
+    - helm init --client-only --service-account tiller --tiller-namespace ${CURRENT_NS}
+    - helm repo add $HELM_ORG $HELM_URL
+  script:
+    - export CURRENT_NS=${STAGING_NAMESPACE}
+    - export CURRENT_RELEASE=${STAGING_RELEASE_NAME}
+    - export kube_config_staging=old
+    - export DEPLOYS=$(helm ls --tiller-namespace $CURRENT_NS | grep $CURRENT_RELEASE | wc -l)
+    - if [ ${DEPLOYS} -eq 0 ]; then helm install --name=${CURRENT_RELEASE} ${HELM_PATH} --set digitMs.image=${CONTAINER_IMAGE} --namespace=${CURRENT_NS} --tiller-namespace=${CURRENT_NS}; else helm upgrade ${CURRENT_RELEASE} ${HELM_PATH} --namespace=${CURRENT_NS} --tiller-namespace=${CURRENT_NS} --set digitMs.image=${CONTAINER_IMAGE} --reuse-values; fi
+  environment:
+    name: staging
+    url: https://staging.id0.dws.im
+  only:
+  - staging
+
+

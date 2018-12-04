@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Demo Project Tiancai
+name: demo-proj
+version: 0.0.1

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "io.grpc.examples.exmath";
+option java_outer_classname = "MathService";
+option objc_class_prefix = "HLWM";
+
+package exmath;
+
+service MathService {
+  rpc Multiply (NumberPair) returns (MathResult) {}
+  rpc Divide (NumberPair) returns (MathResult) {}
+  rpc Add (NumberPair) returns (MathResult) {}
+  rpc Subtract (NumberPair) returns (MathResult) {}
+  rpc Pow (NumberPair) returns (MathResult) {}
+}
+
+
+message MathResult {
+  double result = 1;
+}
+
+message NumberPair {
+  double a = 1;
+  double b = 2;
+}

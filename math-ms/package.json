@@ -1,0 +1,16 @@
+{
+  "name": "math-ms",
+  "version": "1.0.0",
+  "description": "math microservice",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=production node index.js"
+  },
+  "author": "TIANCAI",
+  "license": "MIT",
+  "dependencies": {
+    "@grpc/proto-loader": "^0.3.0",
+    "google-protobuf": "^3.6.1",
+    "grpc": "^1.17.0-pre1"
+  }
+}

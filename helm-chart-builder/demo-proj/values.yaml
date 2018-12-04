@@ -1,0 +1,13 @@
+frontendMs:
+  image: registry.<YOUR_GITLAB_DOMAIN>/k8stest/frontend-ms:localbuild_0001
+  imagePullSecret: regcred
+  replicaCount: 3
+  alicloudLoadBalancerCertID: <YOUR_APP_CERT_ID_FROM_ALIYUN>
+digitMs:
+  image: registry.<YOUR_GITLAB_DOMAIN>/k8stest/digit-ms:localbuild_0001
+  imagePullSecret: regcred
+  replicaCount: 2
+mathMs:
+  image: registry.<YOUR_GITLAB_DOMAIN>/k8stest/math-ms:localbuild_0001
+  imagePullSecret: regcred
+  replicaCount: 2

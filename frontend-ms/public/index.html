@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
+  <title>AI Blackboard</title>
+<style type="text/css">
+body,html{
+  position: absolute;
+  top:0;
+  left:0;
+  margin:0;
+  padding:0;
+  z-index: 0;
+  display:block;
+  width:100%;
+  height:100%;
+  background: #f2f2f2;
+  text-align: center;
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive; 
+
+}
+*{
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+
+}
+.mainCon {
+  display:inline-block;
+  text-align: left;
+  position:relative;
+  top:10%;
+  left:0;
+  width:76%;
+  height:56%;
+  padding:2%;
+  margin:0;
+  border-radius:2px;
+  color:#eee;
+  background-image:  url(data:image/jpeg;base64,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);
+  background-repeat: repeat;
+}
+.ssCanvas {
+  border:2px dashed rgba(255, 255, 255, 0.75);
+  position: absolute;
+  top:0;
+  left:0;
+  width:112px;
+  height:112px;
+
+}
+.digitCanv {
+  z-index:2;
+  opacity: 0;
+}
+.canvCon {
+  display:inline-block;
+  width:112px;
+  height:112px;
+  position:relative;
+  top:0;
+  left:0;
+
+}
+</style>
+<style type="text/css">
+.eqSectionCon {
+  display:block;
+  text-align:center;
+}
+.eqSection {
+  display:inline-table;
+  vertical-align: middle;
+  text-align: center;
+}
+.eqSection > div {
+  display:table-cell;
+  vertical-align: middle;
+  text-align: center;
+  padding:8px 24px;
+}
+.digitOpPar
+{
+  width:200px;
+}
+.opBtn {
+
+    width: 100%;
+    display: block;
+    padding: 8px 0px;
+    margin: 0;
+    font-size: 24px;
+    background: rgba(141, 151, 161, 0.5);
+    border: 1px solid rgba(239, 225, 225, 0.5);
+    color: #f1f1f1;
+    border-radius: 12px;
+    vertical-align: middle;
+    margin: 4px 0px;
+    outline: none;
+  font-family: Cambria, Utopia, "Liberation Serif", Times, "Times New Roman", serif;
+}
+.opBtn:hover {
+    background: rgba(215, 225, 235, 0.5);
+    border-color: rgba(239, 225, 225, 0.692);
+    color: #ffffff;
+
+}
+.opBtn:disabled {
+  opacity:0.5;
+  background: rgba(90, 97, 104, 0.5);
+
+}
+.opBtn:active {
+
+    background: rgba(7, 103, 198, 0.886);
+    border-color: rgba(29, 79, 186, 0.92);
+    color: #ffffff;
+} 
+.clearBtn {
+
+    width: 100%;
+    display: block;
+    padding: 8px 0px;
+    margin: 0;
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive; 
+
+    font-size: 14px;
+    background: rgba(141, 151, 161, 0.5);
+    border: 1px solid rgba(239, 225, 225, 0.5);
+    color: #f1f1f1;
+    border-radius: 12px;
+    vertical-align: middle;
+    margin: 4px 0px;
+    outline: none;
+}
+.clearBtn:hover {
+    background: rgba(215, 225, 235, 0.5);
+    border-color: rgba(239, 225, 225, 0.692);
+    color: #ffffff;
+
+}
+.clearBtn:disabled {
+  opacity:0.5;
+  background: rgba(90, 97, 104, 0.5);
+
+}
+.clearBtn:active {
+
+    background: rgba(7, 103, 198, 0.886);
+    border-color: rgba(29, 79, 186, 0.92);
+    color: #ffffff;
+} 
+.digitOpEq {
+  font-size:52px;
+}
+.digitResult {
+  font-size:64px;
+}
+.sampleErrorMessage {
+  text-align:center;
+  font-size:24px;
+  padding-top:32px;
+  color:#f00;
+}
+.opDigitResult {
+  display:inline-block;
+  width:80px;
+  text-align: center;
+}
+.sampleSectionTitle
+{
+  font-size:32px;
+}
+</style>
+</head>
+
+<body>
+  <div class="mainCon">
+
+      <div class="sampleSection">
+          <div class="sampleSectionTitle">Digit Recognition</div>
+          <div class="eqSectionCon">
+          <div class="eqSection">
+              <div class="digitDrawPar">
+                <div class="canvConMain" id="digitConA"></div>
+                <div class="clearBtnCon"><button class="clearBtn" id="clearBtnA">Clear</button></div>
+              </div>
+              <div class="digitOpPar">
+                  <button class="opBtn" id="opBtnAdd">&plus;</button>
+                  <button class="opBtn" id="opBtnSub">&minus;</button>
+                  <button class="opBtn" id="opBtnMul">&times;</button>
+                  <button class="opBtn" id="opBtnDiv">&divide;</button>
+              </div>
+              <div class="digitDrawPar">
+                <div class="canvConMain" id="digitConB"></div>
+                <div class="clearBtnCon"><button class="clearBtn" id="clearBtnB">Clear</button></div>
+              </div>
+              <div class="digitOpEq">=</div>
+              <div class="digitResult"><span id="opDigitResult">...</span></div>
+          </div>
+          </div>
+          
+          <div class="sampleErrorMessage">
+            <div class="sampleErrorMessageInner" id="opErrMsg"></div>
+          </div>
+        </div>
+
+  </div>
+<script type="text/javascript" src="axios.min.js"></script>
+<script type="text/javascript" src="exAPI.js"></script>
+<script type="text/javascript" src="digitDraw2.js"></script>
+<script type="text/javascript">
+function init() {
+  initDraw();
+}
+init();
+</script>
+</body>
+
+</html>

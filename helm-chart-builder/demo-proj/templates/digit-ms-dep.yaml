@@ -1,0 +1,31 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: digit-ms
+spec:
+  replicas: {{ .Values.digitMs.replicaCount }}
+  template:
+    metadata:
+      labels:
+        name: digit-ms
+    spec:
+      containers:
+      - name: digit-ms
+        image: {{ .Values.digitMs.image }}
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        ports:
+        - containerPort: 50052
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - all
+          readOnlyRootFilesystem: true
+      imagePullSecrets:
+        - name: {{ .Values.digitMs.imagePullSecret }}

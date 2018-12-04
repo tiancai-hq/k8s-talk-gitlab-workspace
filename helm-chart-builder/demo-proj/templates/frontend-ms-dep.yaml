@@ -1,0 +1,30 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: frontend-ms
+spec:
+  replicas: {{ .Values.frontendMs.replicaCount }}
+  template:
+    metadata:
+      labels:
+        name: frontend-ms
+    spec:
+      containers:
+      - name: frontend-ms
+        image: {{ .Values.frontendMs.image }}
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+        ports:
+        - containerPort: 3000
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - all
+      imagePullSecrets:
+        - name: {{ .Values.frontendMs.imagePullSecret }}

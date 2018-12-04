@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-ms
+  labels:
+    name: frontend-ms
+  annotations:
+    service.beta.kubernetes.io/alicloud-loadbalancer-ProtocolPort: "https:443,http:80"
+    service.beta.kubernetes.io/alicloud-loadbalancer-CertID: {{ .Values.frontendMs.alicloudLoadBalancerCertID }}
+spec:
+  type: LoadBalancer
+  ports:
+  - name: https
+    protocol: TCP
+    port: 443
+    targetPort: 3000
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 3000
+  selector:
+    name: frontend-ms

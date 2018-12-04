@@ -1,0 +1,18 @@
+{
+  "name": "api-ms",
+  "version": "1.0.0",
+  "description": "api ms",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=production ML_SERVICE_HOST='digit-ms:50052' MATH_SERVICE_HOST='math-ms:50051' node index.js"
+  },
+  "author": "TIANCAI",
+  "license": "MIT",
+  "dependencies": {
+    "@grpc/proto-loader": "^0.3.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "google-protobuf": "^3.6.1",
+    "grpc": "^1.17.0-pre1"
+  }
+}
